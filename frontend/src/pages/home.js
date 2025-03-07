@@ -10,14 +10,18 @@ const Home = () => {
     const fetchPosts = async () => {
       try {
         const { data } = await API.get('/posts');
-        setPosts(data);
+        // Sort posts by creation date descending (newest first)
+        const sortedPosts = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setPosts(sortedPosts);
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
     };
     fetchPosts();
   }, []);
-
+  
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Recent Blog Posts</h1>
