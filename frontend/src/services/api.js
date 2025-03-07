@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Set the base URL for all API requests
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://blog-backend-q3jz.onrender.com/api",
   withCredentials: true, // if you need to send cookies along
 });
 
