@@ -10,13 +10,31 @@ import profileRoutes from "./routes/profileRoutes.js";
 dotenv.config();
 
 const app = express();
-app.use(express.json());
+
+// ✅ Fix: Configure CORS first
+const allowedOrigins = [
+  "https://blog-web-neon-zeta.vercel.app", // Production
+  "http://localhost:3000", // Development
+];
 
 const corsOptions = {
-  origin: "https://blog-web-neon-zeta.vercel.app", // Update in production
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // ✅ Allow all necessary methods
+  allowedHeaders: ["Content-Type", "Authorization"], // ✅ Explicitly allow headers
 };
+
 app.use(cors(corsOptions));
+app.options("*", cors()); // ✅ Handle preflight requests
+
+// ✅ Fix: Use `express.json()` after CORS
+app.use(express.json());
 
 // Routes
 app.use("/api/posts", postRoutes);
@@ -27,11 +45,15 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Connect to DB before starting server
-await connectDB();
+// ✅ Fix: Proper async DB connection
+connectDB()
+  .then(() => {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error("Database connection failed:", err);
+    process.exit(1);
+  });
 
-// **Remove @vercel/node and use traditional Express**
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-export default app; // This helps in case Vercel needs it
+export default app;
