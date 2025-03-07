@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: "https://blog-web-neon-zeta.vercel.app/", // Update in production
+  origin: "https://blog-web-neon-zeta.vercel.app", // Update in production
   credentials: true,
 };
 app.use(cors(corsOptions));
